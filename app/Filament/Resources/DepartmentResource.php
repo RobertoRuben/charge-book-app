@@ -73,7 +73,43 @@ class DepartmentResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from')
+                            ->label('Fecha desde')
+                            ->placeholder('DD/MM/YYYY')
+                            ->displayFormat('d/m/Y')
+                            ->timezone('America/Lima'),
+                        Forms\Components\DatePicker::make('created_until')
+                            ->label('Fecha hasta')
+                            ->placeholder('DD/MM/YYYY')
+                            ->displayFormat('d/m/Y')
+                            ->timezone('America/Lima'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+
+                        if ($data['created_from'] ?? null) {
+                            $indicators['created_from'] = 'Creado desde ' . \Carbon\Carbon::parse($data['created_from'])->format('d/m/Y');
+                        }
+
+                        if ($data['created_until'] ?? null) {
+                            $indicators['created_until'] = 'Creado hasta ' . \Carbon\Carbon::parse($data['created_until'])->format('d/m/Y');
+                        }
+
+                        return $indicators;
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
