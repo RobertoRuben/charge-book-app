@@ -26,4 +26,12 @@ class Employee extends Model
     {
         return "{$this->last_name} {$this->middle_name}, {$this->first_names}";
     }
+
+    /**
+     * Obtiene el usuario asociado con este empleado.
+     */
+    public function user()
+    {
+        return $this->hasOne(User::class);
+    }
 }
