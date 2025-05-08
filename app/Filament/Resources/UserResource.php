@@ -71,6 +71,7 @@ class UserResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('employee_id')
                             ->label('Empleado')
+                            ->required()
                             ->relationship('employee', 'id')
                             ->getOptionLabelFromRecordUsing(fn(Employee $record) => $record->full_name)
                             ->searchable(['last_name', 'middle_name', 'first_names'])
