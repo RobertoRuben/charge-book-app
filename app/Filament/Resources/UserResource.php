@@ -76,7 +76,19 @@ class UserResource extends Resource
                             ->getOptionLabelFromRecordUsing(fn(Employee $record) => $record->full_name)
                             ->searchable(['last_name', 'middle_name', 'first_names'])
                             ->preload()
-                            ->placeholder('Seleccione un empleado')
+                            ->placeholder('Seleccione un empleado'),
+                    ]),
+
+                Forms\Components\Section::make('Permisos y Roles')
+                    ->description('Configura los roles de acceso del usuario')
+                    ->icon('heroicon-o-key')
+                    ->schema([
+                        Forms\Components\Select::make('roles')
+                            ->label('Roles')
+                            ->relationship('roles', 'name')
+                            ->multiple()
+                            ->preload()
+                            ->helperText('Los permisos se asignan según el rol seleccionado'),
                     ]),
             ]);
     }
@@ -98,6 +110,12 @@ class UserResource extends Resource
                     ->placeholder('Sin empleado asociado'),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->label('Roles')
+                    ->badge()
+                    ->color('primary')
+                    ->separator(',')
+                    ->placeholder('Sin roles asignados'),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->label('Verificado')
                     ->dateTime('d/m/Y H:i')
@@ -135,11 +153,11 @@ class UserResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     })
                     ->indicateUsing(function (array $data): array {
@@ -159,7 +177,7 @@ class UserResource extends Resource
                 Tables\Filters\SelectFilter::make('employee_id')
                     ->label('Empleado')
                     ->relationship('employee', 'last_name')
-                    ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
+                    ->getOptionLabelFromRecordUsing(fn(Employee $record) => $record->full_name)
                     ->searchable()
                     ->preload()
                     ->placeholder('Seleccione un empleado'),
