@@ -41,8 +41,9 @@ class Document extends Model
      * @var array<int, string>
      */
     protected $hidden = [
-        'file_path',
     ];
+
+    protected $appends = ['file_url']; // Asegúrate que está agregado
 
     /**
      * The "booted" method of the model.
@@ -80,9 +81,8 @@ class Document extends Model
      */
     public function getFileUrlAttribute(): ?string
     {
-        return $this->file_path ? Storage::url($this->file_path) : null;
+        return $this->file_path ? Storage::disk('public')->url($this->file_path) : null;
     }
-
     /**
      * Get the employee that owns the document.
      */
